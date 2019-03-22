@@ -1,0 +1,3 @@
+https://www.elastic.co/guide/en/elasticsearch/reference/current/getting-started.html
+https://medium.com/@factoryhr/elasticsearch-introduction-implementation-and-example-17dd66c35c35
+https://madewithlove.be/how-to-integrate-your-laravel-app-with-elasticsearch/
