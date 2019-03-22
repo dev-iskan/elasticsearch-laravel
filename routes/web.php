@@ -11,6 +11,8 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/', function (\Illuminate\Http\Request $request) {
+    $users = \App\User::search($request->q)->get();
+
+    dd($users);
 });

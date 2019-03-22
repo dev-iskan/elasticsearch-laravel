@@ -52,6 +52,21 @@ class ElasticSearchEngine extends Engine
      */
      public function search(Builder $builder){
         //don't  return result
+         $params = [
+             "index" => $builder->model->searchableAs(),  // ex. users
+             "type" => $builder->model->searchableAs(),
+             "body" => [
+                 "query" => [
+                     "multi_match"=> [
+                         "query"=> $builder->query,
+                         "fields"=> ["name", "username", "email"],
+                         "type" => "phrase_prefix"
+                     ]
+                 ]
+             ]
+         ];
+
+         return $this->client->search($params);
      }
 
     /**
@@ -82,6 +97,14 @@ class ElasticSearchEngine extends Engine
      */
      public function map(Builder $builder, $results, $model){
          // return result from elasticsearch
+         if(count($hits = collect(array_get($results, 'hits.hits'))) === 0) {
+            return $model->newCollection();
+         }
+
+         return $model->getScoutModelsByIds(
+             $builder,
+             $hits->pluck('_id')->values()->all()
+         );
      }
 
     /**
