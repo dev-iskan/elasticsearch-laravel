@@ -2,12 +2,18 @@
 
 namespace App\Search\Engines;
 
+use Elasticsearch\Client;
 use Laravel\Scout\Builder;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Scout\Engines\Engine;
 
 class ElasticSearchEngine extends Engine
 {
+    protected $client;
+    public function __construct(Client $client)
+    {
+        $this->client = $client;
+    }
+
     /**
      * Update the given model in the index.
      *
@@ -16,6 +22,7 @@ class ElasticSearchEngine extends Engine
      */
      public function update($models){
          //take collection of models
+         dd($this->client);
      }
 
     /**

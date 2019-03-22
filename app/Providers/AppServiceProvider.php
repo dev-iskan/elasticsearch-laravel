@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Search\Engines\ElasticSearchEngine;
+use Elasticsearch\ClientBuilder;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Scout\EngineManager;
 
@@ -15,8 +16,20 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->app->singleton('elasticsearch', function () {
+            //register as singleton our elasticsearch-php package
+            return ClientBuilder::create()
+                ->setHosts([
+                    'elasticsearch.test:9200'
+                ])
+                ->build();
+        });
+
         resolve(EngineManager::class)->extend('elasticsearch', function () {
-            return new ElasticSearchEngine();
+            // pass added package as param
+            return new ElasticSearchEngine(
+                app('elasticsearch')
+            );
         });
     }
 
