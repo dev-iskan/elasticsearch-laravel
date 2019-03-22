@@ -20,7 +20,7 @@ class AppServiceProvider extends ServiceProvider
             //register as singleton our elasticsearch-php package
             return ClientBuilder::create()
                 ->setHosts([
-                    'elasticsearch.test:9200'
+                    'localhost:9200'
                 ])
                 ->build();
         });

@@ -10,3 +10,11 @@ https://laravel.com/docs/5.8/scout
   scout:import         Import the given model into the search index
 
 set driver in env to elasticsearch
+
+configure new engine
+
+install elasticsearch-php
+set singleton in AppService
+
+
+create index creation in engine update method
