@@ -42,6 +42,15 @@ class ElasticSearchEngine extends Engine
      */
      public function delete($models){
          //delete from index
+         $models->each(function ($model) {
+            $params = [
+                "index" => $model->searchableAs(),  // ex. users
+                "type" => $model->searchableAs(),
+                "id" => $model->id,
+            ];
+
+            $this->client->delete($params);
+         });
      }
 
     /**

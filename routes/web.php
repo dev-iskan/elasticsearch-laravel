@@ -16,3 +16,7 @@ Route::get('/', function (\Illuminate\Http\Request $request) {
 
     dd($users);
 });
+
+Route::get('/delete', function (\Illuminate\Http\Request $request) {
+    \App\User::find($request->id)->delete();
+});
