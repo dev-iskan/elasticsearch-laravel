@@ -38,6 +38,10 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    public function searchableFields() {
+        return ['username', 'email', 'name'];
+    }
+
     public function toSearchableArray()
     {
         return [

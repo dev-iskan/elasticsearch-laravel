@@ -3,6 +3,7 @@
 namespace App\Search\Engines;
 
 use Elasticsearch\Client;
+use Illuminate\Support\Facades\Artisan;
 use Laravel\Scout\Builder;
 use Laravel\Scout\Engines\Engine;
 
@@ -121,7 +122,15 @@ class ElasticSearchEngine extends Engine
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return void
      */
-     public function flush($model){}
+     public function flush($model){
+         $this->client->indices()->delete([
+             "index" => $model->searchableAs(),
+         ]);
+
+         Artisan::call('scout:elasticsearch:create', [
+             'model' => get_class($model)
+         ]);
+     }
 
      protected function performSearch(Builder $builder, array $options = []) {
          $params = array_merge_recursive($this->getRequestBody($builder->model),[
@@ -131,7 +140,7 @@ class ElasticSearchEngine extends Engine
                  "query" => [
                      "multi_match"=> [
                          "query"=> $builder->query ?? '',
-                         "fields"=> ["name", "username", "email"],
+                         "fields"=> $this->getSearchableFields($builder->model),
                          "type" => "phrase_prefix"
                      ]
                  ]
@@ -146,5 +155,14 @@ class ElasticSearchEngine extends Engine
             "index" => $model->searchableAs(),  // ex. users
             "type" => $model->searchableAs(),
         ],$options);
+     }
+
+     // get searchable fields, if it doesn't exist it will search on every fields of model
+     protected function getSearchableFields($model) {
+         if (!method_exists($model, 'searchableFields')) {
+            return [];
+         }
+
+         return $model->searchableFields();
      }
 }
