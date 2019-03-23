@@ -72,7 +72,12 @@ class ElasticSearchEngine extends Engine
      * @param  int  $page
      * @return mixed
      */
-     public function paginate(Builder $builder, $perPage, $page){}
+     public function paginate(Builder $builder, $perPage, $page){
+         return $this->performSearch($builder, [
+             'from' => ($page - 1) * $perPage, // 1 - 1 * $perPage
+             'size' => $perPage
+         ]);
+     }
 
     /**
      * Pluck and return the primary keys of the given results.
@@ -108,7 +113,9 @@ class ElasticSearchEngine extends Engine
      * @param  mixed  $results
      * @return int
      */
-     public function getTotalCount($results){}
+     public function getTotalCount($results){
+         array_get($results, 'hits.total', 0);
+     }
 
     /**
      * Flush all of the model's records from the engine.

@@ -12,7 +12,7 @@
 */
 
 Route::get('/', function (\Illuminate\Http\Request $request) {
-    $users = \App\User::search($request->q)->get();
+    $users = \App\User::search($request->q)->paginate(3);
 
     dd($users);
 });
