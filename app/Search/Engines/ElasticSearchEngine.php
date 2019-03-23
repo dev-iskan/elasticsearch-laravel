@@ -52,21 +52,7 @@ class ElasticSearchEngine extends Engine
      */
      public function search(Builder $builder){
         //don't  return result
-         $params = [
-             "index" => $builder->model->searchableAs(),  // ex. users
-             "type" => $builder->model->searchableAs(),
-             "body" => [
-                 "query" => [
-                     "multi_match"=> [
-                         "query"=> $builder->query,
-                         "fields"=> ["name", "username", "email"],
-                         "type" => "phrase_prefix"
-                     ]
-                 ]
-             ]
-         ];
-
-         return $this->client->search($params);
+         return $this->performSearch($builder);
      }
 
     /**
@@ -122,4 +108,24 @@ class ElasticSearchEngine extends Engine
      * @return void
      */
      public function flush($model){}
+
+     protected function performSearch(Builder $builder, array $options = []) {
+         $params = array_merge_recursive([
+             "index" => $builder->model->searchableAs(),  // ex. users
+             "type" => $builder->model->searchableAs(),
+             "body" => [
+                 "from" => 0,
+                 "size" => 5000,
+                 "query" => [
+                     "multi_match"=> [
+                         "query"=> $builder->query,
+                         "fields"=> ["name", "username", "email"],
+                         "type" => "phrase_prefix"
+                     ]
+                 ]
+             ]
+         ], $options);
+
+         return $this->client->search($params);
+     }
 }
