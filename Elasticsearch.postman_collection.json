@@ -1,0 +1,160 @@
+{
+	"info": {
+		"_postman_id": "1032e448-a9e0-403b-9001-66bb26ba7e0b",
+		"name": "Elasticsearch",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "TEST elastic",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://elasticsearch.test:9200",
+					"protocol": "http",
+					"host": [
+						"elasticsearch",
+						"test"
+					],
+					"port": "9200"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT users config to elastic",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"settings\": {\n\t\t\"index\": {\n\t\t\t\"analysis\": {\n\t\t\t\t\"filter\": {\n\t\t\t\t\t\"words_splitter\": {\n\t\t\t\t\t\t\"type\": \"word_delimiter\",\n\t\t\t\t\t\t\"preserve_original\": \"true\",\n\t\t\t\t\t\t\"catenate_all\": \"true\"\n\t\t\t\t\t}\n\t\t\t\t},\n\t\t\t\t\"analyzer\": {\n\t\t\t\t\t\"default\": {\n\t\t\t\t\t\t\"type\": \"custom\",\n\t\t\t\t\t\t\"tokenizer\": \"standard\",\n\t\t\t\t\t\t\"char_filter\": [\"html_strip\"],\n\t\t\t\t\t\t\"filter\": [\"lowercase\", \"words_splitter\"]\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n}"
+				},
+				"url": {
+					"raw": "http://elasticsearch.test:9200/users",
+					"protocol": "http",
+					"host": [
+						"elasticsearch",
+						"test"
+					],
+					"port": "9200",
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET analyzed data for users",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"analyzer\": \"default\",\n\t\"text\": \"iskandar.rakhi\"\n}"
+				},
+				"url": {
+					"raw": "http://elasticsearch.test:9200/users/_analyze",
+					"protocol": "http",
+					"host": [
+						"elasticsearch",
+						"test"
+					],
+					"port": "9200",
+					"path": [
+						"users",
+						"_analyze"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create new index on username",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"iskandar.rakhi\",\n\t\"name\": \"Iskandar Rakhimov\"\n}"
+				},
+				"url": {
+					"raw": "http://elasticsearch.test:9200/users/1",
+					"protocol": "http",
+					"host": [
+						"elasticsearch",
+						"test"
+					],
+					"port": "9200",
+					"path": [
+						"users",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "search users POST",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"query\": {\n\t\t\"multi_match\": {\n\t\t\t\"query\": \"al\",\n\t\t\t\"fields\": [\"name\", \"username\", \"email\"],\n\t\t\t\"type\": \"phrase_prefix\"\n\t\t}\n\t}\n}"
+				},
+				"url": {
+					"raw": "http://elasticsearch.test:9200/users/_search",
+					"protocol": "http",
+					"host": [
+						"elasticsearch",
+						"test"
+					],
+					"port": "9200",
+					"path": [
+						"users",
+						"_search"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
