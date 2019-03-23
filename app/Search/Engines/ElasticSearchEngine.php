@@ -23,12 +23,10 @@ class ElasticSearchEngine extends Engine
      public function update($models){
          //take collection of models
          $models->each(function ($model) {
-            $params =[
-                "index" => $model->searchableAs(),  // ex. users
-                "type" => $model->searchableAs(),
+            $params =$this->getRequestBody($model, [
                 "id" => $model->id,
                 "body" => $model->toSearchableArray()
-            ];
+            ]);
 
             $this->client->index($params);
          });
@@ -43,11 +41,9 @@ class ElasticSearchEngine extends Engine
      public function delete($models){
          //delete from index
          $models->each(function ($model) {
-            $params = [
-                "index" => $model->searchableAs(),  // ex. users
-                "type" => $model->searchableAs(),
+            $params = $this->getRequestBody($model,[
                 "id" => $model->id,
-            ];
+            ]);
 
             $this->client->delete($params);
          });
@@ -85,7 +81,9 @@ class ElasticSearchEngine extends Engine
      * @param  mixed  $results
      * @return \Illuminate\Support\Collection
      */
-     public function mapIds($results){}
+     public function mapIds($results){
+         return collect(array_get($results,'hits.hits'))->pluck('_id')->values();
+     }
 
     /**
      * Map the given results to instances of the given model.
@@ -114,7 +112,7 @@ class ElasticSearchEngine extends Engine
      * @return int
      */
      public function getTotalCount($results){
-         array_get($results, 'hits.total', 0);
+         return array_get($results, 'hits.total', 0);
      }
 
     /**
@@ -126,15 +124,13 @@ class ElasticSearchEngine extends Engine
      public function flush($model){}
 
      protected function performSearch(Builder $builder, array $options = []) {
-         $params = array_merge_recursive([
-             "index" => $builder->model->searchableAs(),  // ex. users
-             "type" => $builder->model->searchableAs(),
+         $params = array_merge_recursive($this->getRequestBody($builder->model),[
              "body" => [
                  "from" => 0,
                  "size" => 5000,
                  "query" => [
                      "multi_match"=> [
-                         "query"=> $builder->query,
+                         "query"=> $builder->query ?? '',
                          "fields"=> ["name", "username", "email"],
                          "type" => "phrase_prefix"
                      ]
@@ -143,5 +139,12 @@ class ElasticSearchEngine extends Engine
          ], $options);
 
          return $this->client->search($params);
+     }
+
+     protected function getRequestBody($model, array $options = []) {
+        return array_merge_recursive([
+            "index" => $model->searchableAs(),  // ex. users
+            "type" => $model->searchableAs(),
+        ],$options);
      }
 }

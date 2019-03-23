@@ -12,7 +12,12 @@
 */
 
 Route::get('/', function (\Illuminate\Http\Request $request) {
-    $users = \App\User::search($request->q)->paginate(3);
+    // get collection of queries
+//    $users = \App\User::search($request->q)->get(3);
+    // get paginated data
+//    $users = \App\User::search($request->q)->paginate(3);
+    // get collection of primary keys of models
+    $users = \App\User::search($request->q)->keys();
 
     dd($users);
 });
